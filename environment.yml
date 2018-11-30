@@ -1,0 +1,17 @@
+name: cmsc320-final-project
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.6
+  - anaconda
+  - jupyter
+  - pandas
+  - numpy
+  - scipy
+  - beautifulsoup4
+  - requests
+  - seaborn
+  - matplotlib
+  - scikit-learn
+  - hdf5
+  - xlrd
