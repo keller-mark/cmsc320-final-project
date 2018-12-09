@@ -11788,8 +11788,8 @@ Final Tutorial Project<br>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h4 id="Table-of-Contents">Table of Contents<a class="anchor-link" href="#Table-of-Contents">&#182;</a></h4><ol>
-<li>Introduction</li>
-<li>Data</li>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#data">Data</a></li>
 <li>Exploration</li>
 <li>Regression Analysis</li>
 <li>Classification Analysis</li>
@@ -11799,6 +11799,375 @@ Final Tutorial Project<br>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For the past few weeks, the Camp Fire in Northern California has been a deadly and destructive force, recieving enormous media coverage. 
+This deadly wildfire that began on November 8, 2018 has left <a href="https://www.usatoday.com/story/news/nation/2018/11/25/california-wildfire-camp-fire-contained/2107829002/">85 people dead, 249 missing, and destroyed thousands of buildings</a>.
+It has resulted in major air quality issues, causing many to <a href="https://www.washingtonpost.com/nation/2018/11/17/behold-latest-sign-apocalypse-air-mask-selfies-fire-ravaged-california/?utm_term=.fe6d94c1991f">wear masks</a> or <a href="https://www.wired.com/story/smoke-from-wildfires-is-a-growing-public-health-crisis-for-cities/">stay indoors</a> to protect their health.
+But this is not the first time a major wildfire has ravaged the west coast of the United States.</p>
+<p>In this tutorial, we will analyze west coast wildfire data from 2010 to 2016, available through the University of California Irvine Data Science Initiative GitHub organization <a href="https://github.com/UCIDataScienceInitiative/Climate_Hackathon/tree/master/west_coast_fires">here</a>. This data has been obtained through the NASA <a href="https://en.wikipedia.org/wiki/Moderate_Resolution_Imaging_Spectroradiometer">Moderate Resolution Imaging Spectroradiometer</a> (MODIS) satellite. We will begin by loading the data and performing exploratory data analysis before diving deeper into regression analysis and classification analysis using basic machine learning methods. These data science methods will allow us to look at past trends and make inferences about future west coast wildfires.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Data">Data<a class="anchor-link" href="#Data">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We will begin by importing Python packages that will help us to load and wrangle the data:</p>
+<ul>
+<li><code>pandas</code>: a package that allows us to build data frames, a tabular data format that can be thought of like a spreadsheet</li>
+<li><code>numpy</code>: a package containing matrix and vector mathematical functions</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The wildfire dataset is contained in a comma-separated values file (CSV) located on GitHub. Pandas has a <code>read_csv</code> function that allows us to load a data frame from a CSV over the web. We will specify the data types of each column using a python <code>dict</code> to ensure that pandas loads the data using the data types that we will want to use in our analysis.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data_url</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/UCIDataScienceInitiative/Climate_Hackathon/master/west_coast_fires/fires.csv&#39;</span>
+<span class="n">dtype</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;confidence&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;day&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s1">&#39;frp&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;dayofyear&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s1">&#39;vdp&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;temp&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;humidity&#39;</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">}</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_url</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[6]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>confidence</th>
+      <th>day</th>
+      <th>frp</th>
+      <th>lat</th>
+      <th>lon</th>
+      <th>month</th>
+      <th>year</th>
+      <th>x</th>
+      <th>y</th>
+      <th>dayofyear</th>
+      <th>vpd</th>
+      <th>temp</th>
+      <th>humidity</th>
+    </tr>
+    <tr>
+      <th>id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10122</th>
+      <td>0.61</td>
+      <td>1</td>
+      <td>6.0</td>
+      <td>32.997</td>
+      <td>-110.765</td>
+      <td>1</td>
+      <td>2010</td>
+      <td>1336.853783</td>
+      <td>110.667</td>
+      <td>0</td>
+      <td>0.232254</td>
+      <td>271.10</td>
+      <td>55.8</td>
+    </tr>
+    <tr>
+      <th>10123</th>
+      <td>0.72</td>
+      <td>1</td>
+      <td>11.1</td>
+      <td>32.995</td>
+      <td>-110.777</td>
+      <td>1</td>
+      <td>2010</td>
+      <td>1335.747633</td>
+      <td>110.445</td>
+      <td>0</td>
+      <td>0.232254</td>
+      <td>271.10</td>
+      <td>55.8</td>
+    </tr>
+    <tr>
+      <th>13460</th>
+      <td>0.57</td>
+      <td>2</td>
+      <td>6.3</td>
+      <td>33.650</td>
+      <td>-113.735</td>
+      <td>1</td>
+      <td>2010</td>
+      <td>1056.936097</td>
+      <td>183.150</td>
+      <td>1</td>
+      <td>0.333371</td>
+      <td>272.70</td>
+      <td>43.6</td>
+    </tr>
+    <tr>
+      <th>13461</th>
+      <td>0.62</td>
+      <td>2</td>
+      <td>10.2</td>
+      <td>32.358</td>
+      <td>-114.922</td>
+      <td>1</td>
+      <td>2010</td>
+      <td>950.464277</td>
+      <td>39.738</td>
+      <td>1</td>
+      <td>0.158511</td>
+      <td>274.70</td>
+      <td>76.8</td>
+    </tr>
+    <tr>
+      <th>22139</th>
+      <td>0.56</td>
+      <td>3</td>
+      <td>14.4</td>
+      <td>33.415</td>
+      <td>-110.860</td>
+      <td>1</td>
+      <td>2010</td>
+      <td>1325.030866</td>
+      <td>157.065</td>
+      <td>2</td>
+      <td>0.159304</td>
+      <td>268.62</td>
+      <td>63.5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The next step is to determine what this wildfire data means so that we can perform exploration. 
+Luckily, the <a href="https://github.com/UCIDataScienceInitiative/Climate_Hackathon/blob/master/west_coast_fires/README.md">README</a> for the GitHub repository provides us with a description of each column:</p>
+<ul>
+<li><code>id</code>: unique identifier of the fire in the overall context of the world dataset</li>
+<li><code>confidence</code>: how much confidence the satellite has that this is actually a fire detection (percent)</li>
+<li><code>day</code>: the day of the month</li>
+<li><code>frp</code>: Fire Radiative Power, the strength of the fire</li>
+<li><code>lat</code>: latitude</li>
+<li><code>lon</code>: longitude</li>
+<li><code>month</code>: month of the year</li>
+<li><code>year</code>: year</li>
+<li><code>x</code>: x position in a uniformly-spaced grid</li>
+<li><code>y</code>: y position in a uniformly-spaced grid</li>
+<li><code>dayofyear</code>: day of the year (from 0 to 364 or 365 for leap years)</li>
+<li><code>vpd</code>: <a href="https://en.wikipedia.org/wiki/Vapour-pressure_deficit">Vapor Pressure Deficit</a>, the difference between the moisture in the air and the amount of moisture the air could hold</li>
+<li><code>temp</code>: temperature (degrees Kelvin)</li>
+<li><code>humidity</code>: humidity (percent)</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Exploration">Exploration<a class="anchor-link" href="#Exploration">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To begin our exploration, we can look at the distributions of some of our variables.</p>
+<p>To visualize data, we can load helpful python visualization packages:</p>
+<ul>
+<li><code>matplotlib</code></li>
+<li><code>seaborn</code></li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/Users/markkeller/miniconda3/envs/cmsc320/lib/python3.6/site-packages/scipy/stats/stats.py:1713: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  return np.add.reduce(sorted[indexer] * weights, axis=axis) / sumval
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[10]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11d544400&gt;</pre>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
     </div>
   </div>
