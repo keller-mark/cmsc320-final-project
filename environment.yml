@@ -8,12 +8,10 @@ dependencies:
   - pandas
   - numpy
   - scipy
-  - beautifulsoup4
   - requests
   - seaborn
   - matplotlib
   - scikit-learn
   - hdf5
   - xlrd
-  - altair=2.3
-  - vega=1.4
+  - cartopy
