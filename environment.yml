@@ -16,3 +16,6 @@ dependencies:
   - xlrd
   - cartopy
   - geoplot
+  - pip
+  - pip:
+    - h3
