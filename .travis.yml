@@ -19,6 +19,7 @@ script:
   - jupyter nbconvert --to html notebook.ipynb
   - mkdir out
   - mv notebook.html out/index.html
+  - mv img out/img
 
 deploy:
   provider: pages
